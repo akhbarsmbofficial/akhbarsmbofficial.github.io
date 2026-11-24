@@ -1,5 +1,24 @@
-{
- "news":{"news":[],"ads":{"top":null,"side":null,"feed":null,"bottom":null}}
+{{"news"{
+ "news": [
+  {
+   "id": 1,
+   "cat": "لبنان",
+   "breaking": true,
+   "date": "2026-11-25T01:25:00+02:00",
+   "title": "تجربة",
+   "summary": "Akhbarsmb official",
+   "body": [
+    "تجربه  الاولى"
+   ]
+  }
+ ],
+ "ads": {
+  "top": null,
+  "side": null,
+  "feed": null,
+  "bottom": null
+ }
+}
  "id": 29926029,
  "cat": "لبنان",
  "breaking": true,
