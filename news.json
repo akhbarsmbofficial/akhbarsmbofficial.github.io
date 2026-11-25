@@ -591,7 +591,11 @@
   }
  ],
  "ads": {
-  "top": null,
+  "top": {
+   "img": "ad-top-1795630245124.jpeg",
+   "href": "https://whatsapp.com/channel/0029ValG90HHLHQR2fDrdi2v",
+   "alt": ""
+  },
   "side": null,
   "feed": null,
   "bottom": null
