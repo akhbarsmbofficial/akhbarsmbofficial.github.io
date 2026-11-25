@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>نشر خبر | Akhbarsmb Official</title>
+<link rel="icon" href="banner.jpg">
+<style>
+:root{--bg:#f3f4fa;--surface:#fff;--ink:#14162e;--muted:#5b5f7e;--line:#dfe1f0;--brand:#3a2fd1;--ok:#0b7a6b;--bad:#d6193f;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0a0c1f;--surface:#14173a;--ink:#eceeff;--muted:#a2a7cf;--line:#262a58;--brand:#8f87ff;--ok:#4cd1b8;--bad:#ff5b7e;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Tahoma,Arial,sans-serif;font-size:16px;line-height:1.7;padding:16px}
+main{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1{font-size:1.4rem;margin:6px 0 0}
+p.sub{margin:0;color:var(--muted);font-size:.92rem}
+label{display:flex;flex-direction:column;gap:4px;font-weight:700}
+label small{font-weight:400;color:var(--muted)}
+input,select,textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+textarea{min-height:110px;resize:vertical}
+.chk{flex-direction:row;align-items:center;gap:10px}
+.chk input{width:22px;height:22px}
+button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:13px 16px;cursor:pointer;background:var(--brand);color:#fff}
+button:disabled{opacity:.5}
+button.alt{background:var(--surface);color:var(--ink);border:1px solid var(--line);font-weight:400;font-size:.9rem;padding:8px 12px}
+details{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+summary{cursor:pointer;font-weight:700}
+.msg{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface)}
+.msg.bad{border-color:var(--bad);color:var(--bad)}
+.msg.ok{border-color:var(--ok);color:var(--ok)}
+#prev{max-width:100%;max-height:200px;border-radius:10px;display:none}
+ol{margin:6px 0 0;padding-inline-start:22px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<h1>نشر خبر جديد</h1>
+<p class="sub">اكتب الخبر، اختر الصورة، واضغط نشر. يظهر على الموقع خلال دقيقة أو اثنتين.</p>
+
+<details id="setup">
+<summary>إعداد النشر (مرة واحدة فقط)</summary>
+<ol class="sub">
+<li>في GitHub: Settings ثم Developer settings ثم Personal access tokens ثم Fine-grained tokens ثم Generate new token.</li>
+<li>Repository access: Only select repositories، واختر مستودع الموقع.</li>
+<li>Permissions ثم Repository permissions ثم <b>Contents</b>: Read and write.</li>
+<li>انسخ المفتاح والصقه هنا.</li>
+</ol>
+<label style="margin-top:8px">المفتاح
+<input id="token" type="password" dir="ltr" placeholder="github_pat_...">
+</label>
+<button class="alt" id="forget" type="button" style="margin-top:8px">حذف المفتاح من هذا المتصفح</button>
+</details>
+
+<label>القسم
+<select id="cat">
+<option>لبنان</option><option>سياسة</option><option>اقتصاد</option><option>رياضة</option><option>تكنولوجيا</option><option>منوعات</option>
+</select>
+</label>
+
+<label class="chk"><input type="checkbox" id="breaking"> خبر عاجل (يظهر في الشريط الأحمر)</label>
+
+<label>العنوان
+<input id="title" type="text" maxlength="200" placeholder="عنوان الخبر">
+</label>
+
+<label>الملخص <small>سطر أو سطران يظهران تحت العنوان</small>
+<textarea id="summary" style="min-height:80px" placeholder="ملخص الخبر"></textarea>
+</label>
+
+<label>نص الخبر <small>افصل بين الفقرات بسطر فارغ</small>
+<textarea id="body" style="min-height:160px" placeholder="الفقرة الأولى.&#10;&#10;الفقرة الثانية."></textarea>
+</label>
+
+<label>الصورة <small>اختياري. تُصغَّر وتُرفع تلقائياً</small>
+<input id="file" type="file" accept="image/*">
+</label>
+<img id="prev" alt="">
+
+<button id="go" type="button">نشر الخبر</button>
+<div id="status" class="msg" hidden></div>
+
+<details id="adbox">
+<summary>📢 إضافة أو إزالة إعلان</summary>
+<div style="display:flex;flex-direction:column;gap:12px;margin-top:10px">
+<label>مكان الإعلان
+<select id="slot">
+<option value="top">الشريط العلوي (970×100 تقريباً)</option>
+<option value="side">المربع الجانبي (300×250)</option>
+<option value="feed">داخل قائمة الأخبار</option>
+<option value="bottom">أسفل الصفحة</option>
+</select>
+</label>
+<label class="chk"><input type="checkbox" id="adremove"> إزالة الإعلان من هذا المكان</label>
+<div id="adfields" style="display:flex;flex-direction:column;gap:12px">
+<label>صورة الإعلان
+<input id="adfile" type="file" accept="image/*">
+</label>
+<label>رابط المعلن <small>يفتح عند الضغط على الإعلان</small>
+<input id="adhref" type="text" dir="ltr" placeholder="https://example.com">
+</label>
+<label>اسم المعلن
+<input id="adalt" type="text" placeholder="اسم المعلن">
+</label>
+</div>
+<button id="adgo" type="button">نشر الإعلان</button>
+</div>
+</details>
+</main>
+
+<script>
+(function(){
+var OWNER="akhbarsmbofficial", REPO="akhbarsmbofficial.github.io", BRANCH="main", FILE="news.json";
+var API="https://api.github.com/repos/"+OWNER+"/"+REPO+"/contents/";
+var $=function(i){return document.getElementById(i)};
+
+function say(t,k){var s=$("status");s.hidden=!t;s.textContent=t||"";s.className="msg"+(k?" "+k:"");if(t)s.scrollIntoView({behavior:"smooth",block:"center"})}
+function pad(n){return String(n).padStart(2,"0")}
+function isoLocal(d){var o=-d.getTimezoneOffset(),s=o>=0?"+":"-";o=Math.abs(o);
+return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+"T"+pad(d.getHours())+":"+pad(d.getMinutes())+":00"+s+pad(Math.floor(o/60))+":"+pad(o%60)}
+function b64enc(str){var b=new TextEncoder().encode(str),s="";for(var i=0;i<b.length;i++)s+=String.fromCharCode(b[i]);return btoa(s)}
+function b64dec(b){var s=atob(b.replace(/\n/g,"")),u=new Uint8Array(s.length);for(var i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return new TextDecoder().decode(u)}
+function hdr(t){return {Authorization:"Bearer "+t,Accept:"application/vnd.github+json"}}
+
+async function getFile(t){
+  var r=await fetch(API+encodeURIComponent(FILE)+"?ref="+BRANCH+"&t="+Date.now(),{headers:hdr(t)});
+  if(r.status===401)throw new Error("المفتاح غير صحيح أو منتهي.");
+  if(!r.ok)throw new Error("تعذر قراءة news.json ("+r.status+"). تأكد من صلاحية المفتاح على المستودع.");
+  var j=await r.json();
+  return {sha:j.sha,text:b64dec(j.content)};
+}
+async function putFile(path,b64,sha,msg,t){
+  var body={message:msg,content:b64,branch:BRANCH};if(sha)body.sha=sha;
+  var r=await fetch(API+encodeURIComponent(path),{method:"PUT",headers:Object.assign({"Content-Type":"application/json"},hdr(t)),body:JSON.stringify(body)});
+  if(r.status===409||r.status===422&&sha)throw new Error("تغيّر الملف أثناء الحفظ. أعد المحاولة.");
+  if(r.status===403||r.status===404)throw new Error("المفتاح لا يملك صلاحية الكتابة (Contents: Read and write).");
+  if(!r.ok)throw new Error("فشل الحفظ ("+r.status+").");
+}
+// shrink photo to max 1200px JPEG so it's light on the site and on mobile data
+function shrink(file){
+  return new Promise(function(res){
+    var fr=new FileReader();
+    fr.onerror=function(){res(null)};
+    fr.onload=function(){
+      var im=new Image();
+      im.onerror=function(){res(null)};
+      im.onload=function(){
+        var m=1200,w=im.width,h=im.height,k=Math.min(1,m/Math.max(w,h));
+        var c=document.createElement("canvas");c.width=Math.round(w*k);c.height=Math.round(h*k);
+        c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+        res(c.toDataURL("image/jpeg",0.85).split(",")[1]);
+      };
+      im.src=fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+function rawB64(file){return new Promise(function(res,rej){var fr=new FileReader();fr.onload=function(){res(fr.result.split(",")[1])};fr.onerror=rej;fr.readAsDataURL(file)})}
+
+var saved=null;try{saved=localStorage.getItem("gh_token")}catch(e){}
+if(saved){$("token").value=saved}else{$("setup").open=true}
+
+$("file").addEventListener("change",function(){
+  var f=this.files[0],p=$("prev");
+  if(f){p.src=URL.createObjectURL(f);p.style.display="block"}else{p.style.display="none"}
+});
+$("forget").addEventListener("click",function(){
+  try{localStorage.removeItem("gh_token")}catch(e){}
+  $("token").value="";$("setup").open=true;say("تم حذف المفتاح من هذا المتصفح.","ok");
+});
+
+$("go").addEventListener("click",async function(){
+  say("");
+  var t=$("token").value.trim(),title=$("title").value.trim(),summary=$("summary").value.trim(),raw=$("body").value.replace(/\r/g,"").trim();
+  if(!t){$("setup").open=true;say("ضع مفتاح GitHub أولاً (الإعداد في الأعلى).","bad");return}
+  if(!title){say("اكتب العنوان أولاً.","bad");return}
+  if(!summary){say("اكتب الملخص أولاً.","bad");return}
+  if(!raw){say("اكتب نص الخبر أولاً.","bad");return}
+  var paras=raw.split(/\n\s*\n/).map(function(p){return p.replace(/\s*\n\s*/g," ").trim()}).filter(Boolean);
+
+  var btn=$("go");btn.disabled=true;btn.textContent="جارٍ النشر...";
+  try{
+    say("جارٍ قراءة الأخبار الحالية...");
+    var f=await getFile(t),data;
+    try{data=JSON.parse(f.text)}catch(e){throw new Error("ملف news.json الحالي فيه خطأ في الصياغة. لم أغيّر شيئاً.")}
+    if(!data||typeof data!=="object"||Array.isArray(data))throw new Error("شكل news.json غير متوقع. لم أغيّر شيئاً.");
+    if(!Array.isArray(data.news))data.news=[];
+
+    var imgName="";
+    var file=$("file").files[0];
+    if(file){
+      say("جارٍ رفع الصورة...");
+      var b=await shrink(file),ext="jpg";
+      if(!b){b=await rawB64(file);ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg"}
+      imgName="news-"+Date.now()+"."+ext;
+      await putFile(imgName,b,null,"صورة خبر",t);
+    }
+
+    var max=0;data.news.forEach(function(n){var v=parseInt(n&&n.id,10);if(!isNaN(v)&&v>max)max=v});
+    var item={id:max+1,cat:$("cat").value,breaking:$("breaking").checked,date:isoLocal(new Date()),title:title,summary:summary,body:paras};
+    if(imgName)item.img=imgName;
+    data.news.unshift(item);
+
+    say("جارٍ نشر الخبر...");
+    await putFile(FILE,b64enc(JSON.stringify(data,null,1)),f.sha,"خبر: "+title.slice(0,60),t);
+    try{localStorage.setItem("gh_token",t)}catch(e){}
+    $("setup").open=false;
+    say("✅ تم النشر. يظهر على الموقع خلال دقيقة أو اثنتين. رقم الخبر: "+item.id,"ok");
+    ["title","summary","body"].forEach(function(i){$(i).value=""});
+    $("file").value="";$("prev").style.display="none";$("breaking").checked=false;
+  }catch(e){say("❌ "+e.message,"bad")}
+  btn.disabled=false;btn.textContent="نشر الخبر";
+});
+
+// ---- ads ----
+$("adremove").addEventListener("change",function(){$("adfields").hidden=this.checked});
+$("adgo").addEventListener("click",async function(){
+  say("");
+  var t=$("token").value.trim(),slot=$("slot").value,remove=$("adremove").checked;
+  if(!t){$("setup").open=true;say("ضع مفتاح GitHub أولاً (الإعداد في الأعلى).","bad");return}
+  var file=$("adfile").files[0],href=$("adhref").value.trim(),alt=$("adalt").value.trim();
+  if(!remove){
+    if(!file){say("اختر صورة الإعلان.","bad");return}
+    if(href&&!/^https?:\/\//i.test(href))href="https://"+href;
+  }
+  var btn=$("adgo");btn.disabled=true;btn.textContent="جارٍ النشر...";
+  try{
+    say("جارٍ قراءة الإعدادات الحالية...");
+    var f=await getFile(t),data;
+    try{data=JSON.parse(f.text)}catch(e){throw new Error("ملف news.json الحالي فيه خطأ في الصياغة. لم أغيّر شيئاً.")}
+    if(!data||typeof data!=="object"||Array.isArray(data))throw new Error("شكل news.json غير متوقع. لم أغيّر شيئاً.");
+    if(!data.ads||typeof data.ads!=="object")data.ads={};
+    if(remove){
+      data.ads[slot]=null;
+    }else{
+      say("جارٍ رفع صورة الإعلان...");
+      var ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg";
+      var name="ad-"+slot+"-"+Date.now()+"."+ext;
+      await putFile(name,await rawB64(file),null,"صورة إعلان",t);
+      data.ads[slot]={img:name,href:href,alt:alt};
+    }
+    say("جارٍ النشر...");
+    await putFile(FILE,b64enc(JSON.stringify(data,null,1)),f.sha,remove?"إزالة إعلان "+slot:"إعلان جديد "+slot,t);
+    try{localStorage.setItem("gh_token",t)}catch(e){}
+    say(remove?"✅ تمت إزالة الإعلان. يتحدّث الموقع خلال دقيقة أو اثنتين.":"✅ تم نشر الإعلان. يظهر خلال دقيقة أو اثنتين.","ok");
+    $("adfile").value="";$("adhref").value="";$("adalt").value="";$("adremove").checked=false;$("adfields").hidden=false;
+  }catch(e){say("❌ "+e.message,"bad")}
+  btn.disabled=false;btn.textContent="نشر الإعلان";
+});
+})();
+</script>
+</body>
+</html>
